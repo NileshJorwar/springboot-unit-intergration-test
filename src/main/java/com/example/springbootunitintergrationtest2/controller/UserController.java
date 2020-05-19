@@ -11,35 +11,46 @@ import java.util.List;
 public class UserController {
 
     private UserService userService;
-    public UserController(UserService userService){
-        this.userService=userService;
+
+    public UserController(UserService userService) {
+        this.userService = userService;
     }
 
+    /*
+    * Apart from these mentioned differences in framework, one major difference is @RequestParam will always expect a value to bind. Hence, if value is not passed, it will give error. This is not the case in @QueryParam
+    To explicitly give the option, use required = false while using @RequestParam*/
+    @GetMapping("/all/test/{id}")
+    //@GetMapping("/all/test/{id}?name=nil&age=10") Not needed in RequestParam
+
+    public String testRequestParam(@PathVariable String id, @RequestParam("name") String name, @RequestParam("age") String age) {
+        return "Hi " + id + " ," + name + ", && " + age;
+    }
+
+
     @GetMapping("/all")
-    public List<UserClass> getData(){
+    public List<UserClass> getData() {
         return userService.findAll();
     }
 
     @GetMapping("/all/{id}")
-    public UserClass getDataByUserNo(@PathVariable String id){
+    public UserClass getDataByUserNo(@PathVariable String id) {
         return userService.findById(Long.parseLong(id));
     }
 
     @PostMapping("/create")
-    public UserClass createUser(@RequestBody UserClass user)
-    {
+    public UserClass createUser(@RequestBody UserClass user) {
         return userService.createUser(user);
     }
 
 
     @DeleteMapping("/delete/{name}")
-    public long deleteUser(@PathVariable String name){
+    public long deleteUser(@PathVariable String name) {
 
         return userService.deleteById(name);
     }
 
     @PutMapping("/put/{address}")
-    public UserClass putUser(@PathVariable String address, @RequestBody UserClass userClass){
-        return userService.putByAdd(address,userClass);
+    public UserClass putUser(@PathVariable String address, @RequestBody UserClass userClass) {
+        return userService.putByAdd(address, userClass);
     }
 }
