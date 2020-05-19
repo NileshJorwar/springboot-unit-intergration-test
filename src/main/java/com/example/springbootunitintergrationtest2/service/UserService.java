@@ -1,0 +1,49 @@
+package com.example.springbootunitintergrationtest2.service;
+
+import com.example.springbootunitintergrationtest2.model.UserClass;
+import com.example.springbootunitintergrationtest2.repository.UserRepository;
+import org.springframework.stereotype.Component;
+
+import javax.transaction.Transactional;
+import java.util.List;
+
+@Component
+public class UserService {
+
+    private UserRepository userRepository;
+
+    public UserService(UserRepository userRepository) {
+        this.userRepository = userRepository;
+    }
+
+    public List<UserClass> findAll() {
+        return userRepository.findAll();
+    }
+
+    public UserClass findById(Long userNo) {
+        return userRepository.findById(userNo).get();
+    }
+
+    @Transactional
+    public long deleteById(String name) {
+        return userRepository.deleteByUsername(name);
+    }
+
+    public UserClass putByAdd(String add, UserClass userClass) {
+        UserClass resUser = userRepository.findByUserAdd(add);
+        UserClass result=null;
+        if(resUser!=null)
+        {
+            resUser.setAge(userClass.getAge());
+            resUser.setUserAdd(userClass.getUserAdd());
+            //resUser.setUserNo(userClass.getUserNo());
+            result= userRepository.save(resUser);
+        }
+        return result;
+    }
+
+    public UserClass createUser(UserClass userClass) {
+        UserClass userClass1 = userRepository.save(userClass);
+        return userClass1;
+    }
+}
