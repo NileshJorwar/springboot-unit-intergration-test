@@ -19,3 +19,14 @@ To explicitly give the option, use required = false while using @RequestParam
 //@GetMapping("/all/test/{id}?name=nil&age=10") Not needed in RequestParam
 Queryparam not used, instead use RequestParam for query parameters in Springboot
 
+@WebMvcTest Includes both the @AutoConfigureWebMvc and the @AutoConfigureMockMvc, among other functionality.Includes both the @AutoConfigureWebMvc and the @AutoConfigureMockMvc, among other functionality.
+@WebMvcTest does not start any server. Since the web server is not started,  RestTemplate or TestRestTemplate cannot be used with @WebMvcTest environment.
+
+If you want to use RestTemplate or TestRestTemplate, then you need to start a server with @SpringBootTest (using webEnviroment attribute).
+```
+Very Imp - when using @WebMvcTest
+make sure to add @Autowired over MockMvc class and @MockBean over
+dependent class while writing test for controller
+No need to setup standalone stuff for mockmvc (needed when using 
+SpringBootTest)
+```    

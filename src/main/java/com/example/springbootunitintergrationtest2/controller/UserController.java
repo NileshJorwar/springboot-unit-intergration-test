@@ -5,6 +5,7 @@ import com.example.springbootunitintergrationtest2.service.UserService;
 import org.springframework.web.bind.annotation.*;
 
 import javax.transaction.Transactional;
+import java.awt.*;
 import java.util.List;
 
 @RestController
@@ -21,7 +22,6 @@ public class UserController {
     To explicitly give the option, use required = false while using @RequestParam*/
     @GetMapping("/all/test/{id}")
     //@GetMapping("/all/test/{id}?name=nil&age=10") Not needed in RequestParam
-
     public String testRequestParam(@PathVariable String id, @RequestParam("name") String name, @RequestParam("age") String age) {
         return "Hi " + id + " ," + name + ", && " + age;
     }
@@ -37,7 +37,7 @@ public class UserController {
         return userService.findById(Long.parseLong(id));
     }
 
-    @PostMapping("/create")
+    @PostMapping(value = "/create",consumes = "application/json")
     public UserClass createUser(@RequestBody UserClass user) {
         return userService.createUser(user);
     }

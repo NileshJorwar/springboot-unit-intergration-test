@@ -3,11 +3,12 @@ package com.example.springbootunitintergrationtest2.service;
 import com.example.springbootunitintergrationtest2.model.UserClass;
 import com.example.springbootunitintergrationtest2.repository.UserRepository;
 import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.util.List;
 
-@Component
+@Service
 public class UserService {
 
     private UserRepository userRepository;
