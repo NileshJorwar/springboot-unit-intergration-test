@@ -8,6 +8,7 @@ import javax.persistence.*;
 @NoArgsConstructor
 @Data
 @Entity
+@Builder
 public class UserClass {
     @Id
     @Column(length = 200)

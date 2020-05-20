@@ -30,3 +30,7 @@ dependent class while writing test for controller
 No need to setup standalone stuff for mockmvc (needed when using 
 SpringBootTest)
 ```    
+
+- Add @Builder to Entity class for use in (ClassName obj = ClassName.builder().prop1().prop2().build())
+- Make sure to add MediaTYpe while dealing with PUT/POST in tests (unit test).
+

@@ -4,8 +4,6 @@ import com.example.springbootunitintergrationtest2.model.UserClass;
 import com.example.springbootunitintergrationtest2.service.UserService;
 import org.springframework.web.bind.annotation.*;
 
-import javax.transaction.Transactional;
-import java.awt.*;
 import java.util.List;
 
 @RestController
