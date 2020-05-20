@@ -1,13 +1,12 @@
 package com.example.springbootunitintergrationtest2.controller;
 
+import com.example.springbootunitintergrationtest2.SpringbootUnitIntergrationTest2Application;
 import com.example.springbootunitintergrationtest2.model.UserClass;
 import com.example.springbootunitintergrationtest2.service.UserService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
@@ -21,24 +20,20 @@ import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.setup.MockMvcBuilders.standaloneSetup;
 
-@WebMvcTest
-public class UserControllerUnitTest {
+@SpringBootTest(classes = SpringbootUnitIntergrationTest2Application.class)
+public class UserControllerIntegrationTestRestTemplate {
 
-    @Autowired
     MockMvc mockMvc;
-    //Controller not needed
-    //UserController mockUserController;
-
-    @MockBean
+    UserController mockUserController;
     UserService mockUserService;
 
-    //Below method not needed when using @WebMvcTest
     @BeforeEach
     public void setup() {
-        //mockUserService = mock(UserService.class);
-        //mockUserController = new UserController(mockUserService);
-        //this.mockMvc = standaloneSetup(this.mockUserController).build();
+        mockUserService = mock(UserService.class);
+        mockUserController = new UserController(mockUserService);
+        this.mockMvc = standaloneSetup(this.mockUserController).build();
     }
 
     @Test
@@ -115,13 +110,13 @@ public class UserControllerUnitTest {
     @Test
     public void testDeleteUser() throws Exception {
 
-        when(mockUserService.deleteById(anyString())).thenReturn(anyLong());
+        when(mockUserService.deleteByName(anyString())).thenReturn(anyLong());
 
         MvcResult mvcResult = mockMvc.perform(delete("/delete/{name}", "testName")
         ).andExpect(status().isOk())
                 .andReturn();
 
-        verify(mockUserService, times(1)).deleteById(anyString());
+        verify(mockUserService, times(1)).deleteByName(anyString());
         verifyNoMoreInteractions(mockUserService);
 
         assertThat(mvcResult).isNotNull();

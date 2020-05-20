@@ -26,7 +26,7 @@ public class UserService {
     }
 
     @Transactional
-    public long deleteById(String name) {
+    public long deleteByName(String name) {
         return userRepository.deleteByUsername(name);
     }
 

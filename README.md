@@ -9,6 +9,14 @@ spring.h2.console.enabled=true
 spring.h2.console.path= /h2
 
 ## Notes ##
+
+# Ways to Define the properties in Tests #
+@SpringBootTest(properties = {"spring.profiles.active=test"})
+@ActiveProfiles(value = {"test"})
+@TestPropertySource("/application-test.properties")
+
+
+# Unit Test for Controller using WebMvcTest annotation #
 ```
 Apart from these mentioned differences in framework, 
 one major difference is @RequestParam will always expect a value to bind. 
@@ -34,3 +42,78 @@ SpringBootTest)
 - Add @Builder to Entity class for use in (ClassName obj = ClassName.builder().prop1().prop2().build())
 - Make sure to add MediaTYpe while dealing with PUT/POST in tests (unit test).
 
+# Unit test using only method signature for controller #
+- Make sure to perform initial setup of controller and its dependencies
+  using Mockito in @BeforeEach
+- Call the Controller methods while mocking service methods 
+
+When writing Tests for methods -
+    Make sure to 
+        - Write return type of actual method as expected output of
+          method such as List, String.
+        Example.
+        ```
+                List<UserClass> expectedList =
+                        Arrays.asList();
+      
+                when(mockUserService.findAll()).thenReturn(expectedList);
+        
+                List<UserClass> actualList =
+                        userController.getData();
+        
+                verify(mockUserService,times(1)).findAll();
+                verifyNoMoreInteractions(mockUserService);
+        
+                assertThat(actualList).isNotNull();
+                assertThat(actualList.size()).isEqualTo(expectedList.size());
+        ```
+# Integration Tests for Controller using SpringBootTest annotation along with MockMvc #
+- Similar to the unit tests written using WebMvcTest annotation
+- Except it bootstraps the entire application
+- Keep all code of methods similar to the unit tests written using WebMvcTest annotation 
+- Remove @WebMvcTest and replace it with @SpringBootTest
+- Dont autowire the MockMvc class, no need to use @MockBean over dependent class (service class)
+- Controller is needed now (not needed in Unit Tests since we were testing URLS)
+- Perform the SetUp using @BeforeEach as below
+
+```
+    @SpringBootTest(classes = SpringbootUnitIntergrationTest2Application.class)
+    public class UserControllerIntegrationTestSpringBootTest {
+    
+        MockMvc mockMvc;
+        UserController mockUserController;
+        UserService mockUserService;
+    
+        @BeforeEach
+        public void setup() {
+            mockUserService = mock(UserService.class);
+            mockUserController = new UserController(mockUserService);
+            this.mockMvc = standaloneSetup(this.mockUserController).build();
+        }
+
+```
+Earlier in Unit Test using @WebMvcTest
+
+```
+@WebMvcTest
+public class UserControllerUnitTest {
+
+    @Autowired
+    MockMvc mockMvc;
+    //Controller not needed
+    //UserController mockUserController;
+
+    @MockBean
+    UserService mockUserService;
+
+    //Below method not needed when using @WebMvcTest
+    @BeforeEach
+    public void setup() {
+        //mockUserService = mock(UserService.class);
+        //mockUserController = new UserController(mockUserService);
+        //this.mockMvc = standaloneSetup(this.mockUserController).build();
+    }
+
+```
+
+# Integration Tests for Controller using SpringBootTest annotation along with RestTemplate #
