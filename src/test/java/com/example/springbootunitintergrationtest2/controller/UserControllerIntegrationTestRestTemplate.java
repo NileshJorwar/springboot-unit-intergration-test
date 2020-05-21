@@ -24,6 +24,7 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -42,7 +43,7 @@ import static org.springframework.test.web.servlet.setup.MockMvcBuilders.standal
 
 @Import(UserControllerIntegrationTestRestTemplate.ControllerConfigP.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, classes = SpringbootUnitIntergrationTest2Application.class)
-
+@DirtiesContext
 public class UserControllerIntegrationTestRestTemplate {
 
 
@@ -89,7 +90,7 @@ public class UserControllerIntegrationTestRestTemplate {
     }
 
     @Test
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     public void testgetDataByUserNo() throws Exception {
 
         String url =

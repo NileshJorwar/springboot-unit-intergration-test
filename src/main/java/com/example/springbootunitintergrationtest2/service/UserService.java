@@ -33,10 +33,11 @@ public class UserService {
     public UserClass putByAdd(String add, UserClass userClass) {
         UserClass resUser = userRepository.findByUserAdd(add);
         UserClass result=null;
-        if(resUser!=null)
+        if(resUser.getAge()!=0)
         {
             resUser.setAge(userClass.getAge());
             resUser.setUserAdd(userClass.getUserAdd());
+            resUser.setUsername(userClass.getUsername());
             //resUser.setUserNo(userClass.getUserNo());
             result= userRepository.save(resUser);
         }
