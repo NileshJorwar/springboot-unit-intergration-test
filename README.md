@@ -162,7 +162,8 @@ insert into user_class (age, user_add, username, user_no) values (13, 'India3', 
 ```
 When Error comes in TestRestTemplate "java.lang.ClassCastException: java.util.LinkedHashMap cannot be cast to com.example.springbootunitintergrationtest2.model.UserClass"
     Get the list in JsonNode and then convert to the list
-   ```      JsonNode jsonNode =
+   ```      
+            JsonNode jsonNode =
                     testRestTemplate.getForObject(uri, JsonNode.class);
             List<UserClass> actual = new ObjectMapper().convertValue(jsonNode, new TypeReference<List<UserClass>>() {
             });
@@ -170,7 +171,8 @@ When Error comes in TestRestTemplate "java.lang.ClassCastException: java.util.Li
    ```
 - Make sure to use Exchange Method of TestRestTemplate for PUT/DELETE http methods
   with first parameter being uri, httpmethod, input (in case of PUT), return type class
-# Use WebTestClient for webflux #
-
-#
-Issues --- TestRestTemplate --- method testgetDataByUserNo() failed as it picks up the data commited by other method which it should not
+### Use WebTestClient for webflux ###
+----------Add Later
+# Issues 
+- TestRestTemplate --- method testgetDataByUserNo() failed as it picks up the data commited by other method which it should not
+- when ran seperate tests, runs but when as suite fails
