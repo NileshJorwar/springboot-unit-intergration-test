@@ -117,3 +117,57 @@ public class UserControllerUnitTest {
 ```
 
 # Integration Tests for Controller using SpringBootTest annotation along with RestTemplate #
+- Make sure to add datasource (database) properties in application.properties
+- Make sure to add randomport in SpringBootTest annotation webenvironment and autowire it within the class
+```
+@Import(UserControllerIntegrationTestRestTemplate.ControllerConfigP.class)
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, classes = SpringbootUnitIntergrationTest2Application.class)
+public class UserControllerIntegrationTestRestTemplate {
+
+
+    @Autowired
+    TestRestTemplate testRestTemplate;
+    @LocalServerPort
+    int randomPort;
+}
+```
+- Add TestRestTemplate in test class configuration and import (@Import(UserControllerIntegrationTestRestTemplate.ControllerConfigP.class)) it within.
+```
+@TestConfiguration
+    public static class ControllerConfigP {
+        @Bean
+        TestRestTemplate testRestTemplate() {
+            return new TestRestTemplate();
+        }
+    }
+```
+- For REST endpoints(GET/POST) to work with TestREstTemplate, should include database properties
+  along with creation of schema and insertion of records in schema.sql and data.sql files. 
+```
+schema.sql
+drop table if exists user_class;
+create table user_class
+(
+user_no int auto_increment primary key,
+username varchar(255) null,
+user_add varchar(255) null,
+age int null
+ )
+-------------
+data.sql
+insert into user_class (age, user_add, username, user_no) values (10, 'India', 'Nilesh', 1);
+insert into user_class (age, user_add, username, user_no) values (11, 'India1', 'Nilesh', 2);
+insert into user_class (age, user_add, username, user_no) values (12, 'India2', 'Nilesh', 3);
+insert into user_class (age, user_add, username, user_no) values (13, 'India3', 'Nilesh', 4);
+```
+When Error comes in TestRestTemplate "java.lang.ClassCastException: java.util.LinkedHashMap cannot be cast to com.example.springbootunitintergrationtest2.model.UserClass"
+    Get the list in JsonNode and then convert to the list
+   ``` JsonNode jsonNode =
+                    testRestTemplate.getForObject(uri, JsonNode.class);
+            List<UserClass> actual = new ObjectMapper().convertValue(jsonNode, new TypeReference<List<UserClass>>() {
+            });
+
+   ```
+- Make sure to use Exchange Method of TestRestTemplate for PUT/DELETE http methods
+  with first parameter being uri, httpmethod, input (in case of PUT), return type class
+# Use WebTestClient for webflux #

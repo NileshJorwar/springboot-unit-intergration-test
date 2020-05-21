@@ -3,14 +3,27 @@ package com.example.springbootunitintergrationtest2.controller;
 import com.example.springbootunitintergrationtest2.SpringbootUnitIntergrationTest2Application;
 import com.example.springbootunitintergrationtest2.model.UserClass;
 import com.example.springbootunitintergrationtest2.service.UserService;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.context.TestConfiguration;
+import org.springframework.boot.test.web.client.TestRestTemplate;
+import org.springframework.boot.web.server.LocalServerPort;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Import;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
+import java.net.URI;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -22,128 +35,142 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.setup.MockMvcBuilders.standaloneSetup;
 
-@SpringBootTest(classes = SpringbootUnitIntergrationTest2Application.class)
+@Import(UserControllerIntegrationTestRestTemplate.ControllerConfigP.class)
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, classes = SpringbootUnitIntergrationTest2Application.class)
 public class UserControllerIntegrationTestRestTemplate {
 
-    MockMvc mockMvc;
-    UserController mockUserController;
-    UserService mockUserService;
 
-    @BeforeEach
-    public void setup() {
-        mockUserService = mock(UserService.class);
-        mockUserController = new UserController(mockUserService);
-        this.mockMvc = standaloneSetup(this.mockUserController).build();
-    }
+    @Autowired
+    TestRestTemplate testRestTemplate;
+    @LocalServerPort
+    int randomPort;
 
     @Test
     public void testAllMethod() throws Exception {
+
         String id = "etstId", name = "testName", age = "10";
-        mockMvc.perform(get("/all/test/{id}", id)
-                .param("name", name)
-                .param("age", age)
-
-        ).andExpect(status().isOk())
-                .andExpect(content().string(containsString("Hi etstId ,testName, && 10")));
-    }
-
-    @Test
-    public void testGetDataMethod() throws Exception {
-        List<UserClass> userClassList = Arrays.asList();
-        when(mockUserService.findAll()).thenReturn(userClassList);
-        MvcResult mvcResult = mockMvc.perform(
-                get("/all")
-        ).andExpect(status().isOk())
-                .andReturn();
-
-        verify(mockUserService, times(1)).findAll();
-        verifyNoMoreInteractions(mockUserService);
-
-        assertThat(mvcResult).isNotNull();
-        assertThat(mvcResult.getResponse().getContentLength()).isEqualTo(userClassList.size());
+        String url =
+                "http://localhost:" + randomPort + "/all/test/testId?name=testName&age=testAge";
+        URI uri = new URI(url);
+        String actaul =
+                testRestTemplate.getForObject(uri, String.class);
+        System.out.println(actaul);
+        assertThat(actaul).isEqualTo("Hi testId ,testName, && testAge");
 
     }
 
     @Test
-    public void testGetDataByUserNoMethod() throws Exception {
+    public void testgetData() throws Exception {
 
-        UserClass expectedUClass = UserClass.builder()
-                .userNo(1)
-                .username("TestName")
-                .age(10)
-                .userAdd("testAdd")
-                .build();
-        when(mockUserService.findById(anyLong())).thenReturn(expectedUClass);
+        String url =
+                "http://localhost:" + randomPort + "/all";
+        URI uri = new URI(url);
+        JsonNode jsonNode =
+                testRestTemplate.getForObject(uri, JsonNode.class);
+        List<UserClass> actual = new ObjectMapper().convertValue(jsonNode, new TypeReference<List<UserClass>>() {
+        });
 
-        MvcResult mvcResult = mockMvc.perform(get("/all/{id}", "1")
-        ).andExpect(status().isOk())
-                .andReturn();
+        System.out.println(actual.get(0).getAge());
 
-        verify(mockUserService, times(1)).findById(anyLong());
-        verifyNoMoreInteractions(mockUserService);
+        assertThat(actual).isNotNull();
+        assertThat(actual.size()).isEqualTo(4);
+        assertThat(actual.get(0).getAge()).isEqualTo(10);
+        assertThat(actual.get(1).getAge()).isEqualTo(11);
+        assertThat(actual.get(2).getAge()).isEqualTo(12);
+        assertThat(actual.get(3).getAge()).isEqualTo(13);
 
-        assertThat(mvcResult).isNotNull();
-        assertThat(mvcResult.getResponse().getContentAsString()).isEqualTo(new ObjectMapper().writeValueAsString(expectedUClass));
 
     }
 
     @Test
-    public void testCreate() throws Exception {
-        UserClass expectedUserClass = new UserClass(1, "Nil", "snis", 10);
+    public void testgetDataByUserNo() throws Exception {
 
-        when(mockUserService.createUser(any())).thenReturn(expectedUserClass);
-        MvcResult mvcResult = mockMvc.perform(
-                post("/create")
-                        .content(new ObjectMapper().writeValueAsString(expectedUserClass))
-                        .contentType(MediaType.APPLICATION_JSON)
-        ).andExpect(status().isOk())
-                .andReturn();
+        String url =
+                "http://localhost:" + randomPort + "/all/2";
+        URI uri = new URI(url);
+        UserClass actual =
+                testRestTemplate.getForObject(uri, UserClass.class);
 
-        verify(mockUserService, times(1)).createUser(any());
-        verifyNoMoreInteractions(mockUserService);
+        System.out.println(actual.toString());
 
-        assertThat(mvcResult).isNotNull();
-        assertThat(mvcResult.getResponse().getContentAsString()).isEqualTo(new ObjectMapper().writeValueAsString(expectedUserClass));
+        assertThat(actual).isNotNull();
+        assertThat(actual.getAge()).isEqualTo(11);
+        assertThat(actual.getUserAdd()).isEqualTo("India1");
+        assertThat(actual.getUsername()).isEqualTo("Nilesh");
+
+    }
+
+    @Test
+    public void testCreateUser() throws Exception {
+
+        String url =
+                "http://localhost:" + randomPort + "/create";
+        URI uri = new URI(url);
+        UserClass expectedUser =
+                UserClass.builder()
+                        .age(16)
+                        .userAdd("USA")
+                        .username("Nil")
+                        .build();
+
+        UserClass actual =
+                testRestTemplate.postForObject(uri, expectedUser, UserClass.class);
+
+        System.out.println(actual.toString());
+
+        assertThat(actual).isNotNull();
+        assertThat(actual.getAge()).isEqualTo(16);
+        assertThat(actual.getUserAdd()).isEqualTo("USA");
+        assertThat(actual.getUsername()).isEqualTo("Nil");
+
+    }
+
+    @Test
+    public void testPutUser() throws Exception {
+
+        String url =
+                "http://localhost:" + randomPort + "/put/India1";
+        URI uri = new URI(url);
+        UserClass expectedUser =
+                UserClass.builder()
+                        .age(16)
+                        .userAdd("USA")
+                        .build();
+
+        ResponseEntity<UserClass> actual =
+                testRestTemplate.exchange(uri, HttpMethod.PUT, new HttpEntity<>(expectedUser), UserClass.class);
+
+        System.out.println(actual.getBody());
+
+        assertThat(actual).isNotNull();
+        assertThat(actual.getBody().getUsername()).isEqualTo("Nilesh");
+        assertThat(actual.getBody().getUserAdd()).isEqualTo("USA");
+        assertThat(actual.getBody().getAge()).isEqualTo(16);
 
     }
 
     @Test
     public void testDeleteUser() throws Exception {
 
-        when(mockUserService.deleteByName(anyString())).thenReturn(anyLong());
+        String url =
+                "http://localhost:" + randomPort + "/delete/Nilesh";
+        URI uri = new URI(url);
 
-        MvcResult mvcResult = mockMvc.perform(delete("/delete/{name}", "testName")
-        ).andExpect(status().isOk())
-                .andReturn();
+        ResponseEntity<Long> actual =
+                testRestTemplate.exchange(uri, HttpMethod.DELETE, null, Long.class);
 
-        verify(mockUserService, times(1)).deleteByName(anyString());
-        verifyNoMoreInteractions(mockUserService);
+        System.out.println(actual.getStatusCode());
 
-        assertThat(mvcResult).isNotNull();
+        assertThat(actual).isNotNull();
 
     }
 
-    @Test
-    public void testPutUser() throws Exception {
-        UserClass expectedUClass = UserClass.builder()
-                .userNo(0)
-                .username("TestName")
-                .age(10)
-                .userAdd("testAdd")
-                .build();
-
-        when(mockUserService.putByAdd(anyString(), any())).thenReturn(expectedUClass);
-
-        MvcResult mvcResult = mockMvc.perform(put("/put/{address}", "testAdd")
-                .content(new ObjectMapper().writeValueAsString(expectedUClass))
-                .contentType(MediaType.APPLICATION_JSON)
-        ).andExpect(status().isOk())
-                .andReturn();
-
-        verify(mockUserService, times(1)).putByAdd(anyString(),any());
-        verifyNoMoreInteractions(mockUserService);
-
-        assertThat(mvcResult).isNotNull();
-        assertThat(mvcResult.getResponse().getContentAsString()).isEqualTo(new ObjectMapper().writeValueAsString(expectedUClass));
+    @TestConfiguration
+    public static class ControllerConfigP {
+        @Bean
+        TestRestTemplate testRestTemplate() {
+            return new TestRestTemplate();
         }
+    }
+
 }

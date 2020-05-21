@@ -9,6 +9,7 @@ import javax.persistence.*;
 @Data
 @Entity
 @Builder
+@ToString
 public class UserClass {
     @Id
     @Column(length = 200)
