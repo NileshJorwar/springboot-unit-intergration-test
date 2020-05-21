@@ -8,6 +8,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestConfiguration;
@@ -19,8 +20,12 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.annotation.Rollback;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.net.URI;
 import java.util.ArrayList;
@@ -37,6 +42,7 @@ import static org.springframework.test.web.servlet.setup.MockMvcBuilders.standal
 
 @Import(UserControllerIntegrationTestRestTemplate.ControllerConfigP.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, classes = SpringbootUnitIntergrationTest2Application.class)
+
 public class UserControllerIntegrationTestRestTemplate {
 
 
@@ -60,6 +66,7 @@ public class UserControllerIntegrationTestRestTemplate {
     }
 
     @Test
+
     public void testgetData() throws Exception {
 
         String url =
@@ -74,15 +81,15 @@ public class UserControllerIntegrationTestRestTemplate {
 
         assertThat(actual).isNotNull();
         assertThat(actual.size()).isEqualTo(4);
-        assertThat(actual.get(0).getAge()).isEqualTo(10);
-        assertThat(actual.get(1).getAge()).isEqualTo(11);
-        assertThat(actual.get(2).getAge()).isEqualTo(12);
-        assertThat(actual.get(3).getAge()).isEqualTo(13);
-
+        assertThat(actual.get(0).getAge()).isEqualTo(11);
+        assertThat(actual.get(1).getAge()).isEqualTo(12);
+        assertThat(actual.get(2).getAge()).isEqualTo(13);
+        assertThat(actual.get(3).getAge()).isEqualTo(10);
 
     }
 
     @Test
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void testgetDataByUserNo() throws Exception {
 
         String url =
@@ -126,6 +133,8 @@ public class UserControllerIntegrationTestRestTemplate {
     }
 
     @Test
+    @Rollback(true)
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void testPutUser() throws Exception {
 
         String url =

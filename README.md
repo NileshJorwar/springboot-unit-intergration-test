@@ -171,3 +171,6 @@ When Error comes in TestRestTemplate "java.lang.ClassCastException: java.util.Li
 - Make sure to use Exchange Method of TestRestTemplate for PUT/DELETE http methods
   with first parameter being uri, httpmethod, input (in case of PUT), return type class
 # Use WebTestClient for webflux #
+
+
+Issues --- TestRestTemplate --- method testgetDataByUserNo() failed as it picks up the data commited by other method which it should not
