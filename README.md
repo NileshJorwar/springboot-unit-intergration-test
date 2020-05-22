@@ -176,4 +176,4 @@ When Error comes in TestRestTemplate "java.lang.ClassCastException: java.util.Li
 ----------Add Later
 ## Issues 
 - TestRestTemplate --- method testgetDataByUserNo() failed as it picks up the data commited by other method which it should not
-- when ran seperate tests, runs but when as suite fails
+- when ran seperate tests, runs but when as suite failed
