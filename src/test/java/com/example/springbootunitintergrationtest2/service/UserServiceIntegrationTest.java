@@ -2,6 +2,7 @@ package com.example.springbootunitintergrationtest2.service;
 
 import com.example.springbootunitintergrationtest2.model.UserClass;
 import com.example.springbootunitintergrationtest2.repository.UserRepository;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -15,7 +16,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
-@DirtiesContext
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
+@Transactional
 class UserServiceIntegrationTest {
 
     @Autowired
@@ -23,6 +25,7 @@ class UserServiceIntegrationTest {
 
     @Autowired
     UserRepository userRepository;
+
 
     @Test
     public void testFindAll() {
@@ -41,7 +44,7 @@ class UserServiceIntegrationTest {
         UserClass aUserClass =
                 userService.findById(2L);
         assertThat(aUserClass.getUserNo()).isEqualTo(2);
-        assertThat(aUserClass.getUsername()).isEqualTo("Nilesh");
+        assertThat(aUserClass.getUsername()).isEqualTo("Sachin");
         assertThat(aUserClass.getUserAdd()).isEqualTo("India1");
 
     }
@@ -51,8 +54,8 @@ class UserServiceIntegrationTest {
 
         long recordDeleted =
                 userService.deleteByName("Nilesh");
-        assertThat(recordDeleted).isEqualTo(4L);
-        assertThat(userService.findAll().size()).isEqualTo(0L);
+        assertThat(recordDeleted).isEqualTo(3L);
+        assertThat(userService.findAll().size()).isEqualTo(1L);
     }
 
     @Test
@@ -66,19 +69,19 @@ class UserServiceIntegrationTest {
     }
 
     @Test
-    @Transactional
     public void testPutByAdd() {
         UserClass expectedUser = UserClass.builder()
                 .username("testN")
-                .userAdd( "testAdd")
+                .userAdd("testAdd")
                 .age(10)
                 .build();
+        UserService userService1 = new UserService(userRepository);
         UserClass aUserClass =
-                userService.putByAdd("India1",expectedUser);
+                userService1.putByAdd("India1", expectedUser);
 
         assertThat(aUserClass.getUserAdd()).isEqualTo(expectedUser.getUserAdd());
         assertThat(aUserClass.getUsername()).isEqualTo(expectedUser.getUsername());
         assertThat(aUserClass.getAge()).isEqualTo(expectedUser.getAge());
-        assertThat(userService.findAll().size()).isEqualTo(4L);
+        assertThat(userRepository.count()).isEqualTo(4L);
     }
 }

@@ -43,7 +43,8 @@ import static org.springframework.test.web.servlet.setup.MockMvcBuilders.standal
 
 @Import(UserControllerIntegrationTestRestTemplate.ControllerConfigP.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, classes = SpringbootUnitIntergrationTest2Application.class)
-@DirtiesContext
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
+@Transactional
 public class UserControllerIntegrationTestRestTemplate {
 
 
@@ -104,7 +105,7 @@ public class UserControllerIntegrationTestRestTemplate {
         assertThat(actual).isNotNull();
         assertThat(actual.getAge()).isEqualTo(11);
         assertThat(actual.getUserAdd()).isEqualTo("India1");
-        assertThat(actual.getUsername()).isEqualTo("Nilesh");
+        assertThat(actual.getUsername()).isEqualTo("Sachin");
 
     }
 
@@ -144,6 +145,7 @@ public class UserControllerIntegrationTestRestTemplate {
         UserClass expectedUser =
                 UserClass.builder()
                         .age(16)
+                        .username("Sachin")
                         .userAdd("USA")
                         .build();
 
@@ -153,7 +155,7 @@ public class UserControllerIntegrationTestRestTemplate {
         System.out.println(actual.getBody());
 
         assertThat(actual).isNotNull();
-        assertThat(actual.getBody().getUsername()).isEqualTo("Nilesh");
+        assertThat(actual.getBody().getUsername()).isEqualTo("Sachin");
         assertThat(actual.getBody().getUserAdd()).isEqualTo("USA");
         assertThat(actual.getBody().getAge()).isEqualTo(16);
 

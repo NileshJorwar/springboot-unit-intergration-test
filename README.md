@@ -24,6 +24,7 @@ one major difference is @RequestParam will always expect a value to bind.
 Hence, if value is not passed, it will give error. This is not the case in @QueryParam
 To explicitly give the option, use required = false while using @RequestParam
 ```
+
 @GetMapping("/all/test/{id}")
 //@GetMapping("/all/test/{id}?name=nil&age=10") Not needed in RequestParam
 Queryparam not used, instead use RequestParam for query parameters in Springboot
@@ -177,3 +178,5 @@ When Error comes in TestRestTemplate "java.lang.ClassCastException: java.util.Li
 ## Issues 
 - TestRestTemplate --- method testgetDataByUserNo() failed as it picks up the data commited by other method which it should not
 - when ran seperate tests, runs but when as suite failed
+- Sometimes its good idea to create new instance each time(used in test method) to run the integration test 
+    Reference ---- UserServiceIntegrationTest method testPutByAdd()

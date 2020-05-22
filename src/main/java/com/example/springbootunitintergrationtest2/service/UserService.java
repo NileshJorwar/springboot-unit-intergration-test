@@ -30,6 +30,7 @@ public class UserService {
         return userRepository.deleteByUsername(name);
     }
 
+    @Transactional
     public UserClass putByAdd(String add, UserClass userClass) {
         UserClass resUser = userRepository.findByUserAdd(add);
         UserClass result=null;
